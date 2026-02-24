@@ -1,0 +1,38 @@
+{
+  "names": [
+    "Jack Reacher",
+    "James Bond",
+    "Ethan Hunt",
+    "Jason Bourne",
+    "John Wick",
+    "Indiana Jones",
+    "Lara Croft",
+    "Harry Potter",
+    "Sherlock Holmes",
+    "Tony Stark"
+  ],
+  "origins": [
+    "Bengaluru",
+    "Mumbai",
+    "Delhi",
+    "Chennai",
+    "Kolkata",
+    "Hyderabad",
+    "Pune",
+    "Ahmedabad",
+    "Jaipur",
+    "Kochi"
+  ],
+  "destinations": [
+    "Mumbai",
+    "Delhi",
+    "Bengaluru",
+    "Chennai",
+    "Kolkata",
+    "Hyderabad",
+    "Pune",
+    "Ahmedabad",
+    "Jaipur",
+    "Kochi"
+  ]
+}

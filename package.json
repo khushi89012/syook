@@ -1,0 +1,12 @@
+{
+  "name": "syook_assesment",
+  "version": "1.0.0",
+  "description": "Backend application that generates an encrypted data stream (Emitter), receives and decrypts it (Listener), validates integrity, stores in MongoDB (minute-bucketed time series), and streams saved data to a small frontend in real time.",
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}

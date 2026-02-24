@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Time Series Data - Real-time</title>
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      margin: 0;
+      padding: 1rem;
+      background: #0f0f12;
+      color: #e4e4e7;
+      min-height: 100vh;
+    }
+    h1 { margin-top: 0; font-weight: 600; }
+    .stats {
+      display: flex;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .stat {
+      background: #18181b;
+      padding: 1rem 1.25rem;
+      border-radius: 8px;
+      border: 1px solid #27272a;
+    }
+    .stat label { display: block; font-size: 0.75rem; color: #71717a; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem; }
+    .stat span { font-size: 1.5rem; font-weight: 600; }
+    .stat.success span { color: #22c55e; }
+    .table-wrap {
+      overflow: auto;
+      max-height: 60vh;
+      border: 1px solid #27272a;
+      border-radius: 8px;
+      background: #18181b;
+    }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid #27272a; }
+    th { position: sticky; top: 0; background: #18181b; color: #a1a1aa; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    tr:hover { background: #27272a; }
+    .empty { text-align: center; color: #71717a; padding: 2rem; }
+    .connection { font-size: 0.875rem; color: #71717a; margin-bottom: 1rem; }
+    .connection.connected { color: #22c55e; }
+    .connection.disconnected { color: #ef4444; }
+  </style>
+</head>
+<body>
+  <div class="connection" id="connection">Connecting...</div>
+  <h1>Time Series Data</h1>
+  <div class="stats">
+    <div class="stat">
+      <label>Total Received</label>
+      <span id="totalReceived">0</span>
+    </div>
+    <div class="stat">
+      <label>Valid / Decoded</label>
+      <span id="totalValid">0</span>
+    </div>
+    <div class="stat success">
+      <label>Success Rate</label>
+      <span id="successRate">0%</span>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Time</th>
+          <th>Name</th>
+          <th>Origin</th>
+          <th>Destination</th>
+        </tr>
+      </thead>
+      <tbody id="tbody">
+        <tr><td colspan="4" class="empty">No data yet. Waiting for stream...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    const tbody = document.getElementById('tbody');
+    const totalReceivedEl = document.getElementById('totalReceived');
+    const totalValidEl = document.getElementById('totalValid');
+    const successRateEl = document.getElementById('successRate');
+    const connectionEl = document.getElementById('connection');
+
+    const LISTENER_URL = window.LISTENER_URL || '';
+    const socket = LISTENER_URL ? io(LISTENER_URL) : io({ path: '/socket.io' });
+
+    socket.on('connect', () => {
+      connectionEl.textContent = 'Connected';
+      connectionEl.className = 'connection connected';
+    });
+    socket.on('disconnect', () => {
+      connectionEl.textContent = 'Disconnected';
+      connectionEl.className = 'connection disconnected';
+    });
+
+    socket.on('stats', (data) => {
+      totalReceivedEl.textContent = data.totalReceived ?? 0;
+      totalValidEl.textContent = data.totalValid ?? 0;
+      successRateEl.textContent = (data.successRate ?? 0).toFixed(2) + '%';
+    });
+
+    socket.on('data', (payload) => {
+      const readings = payload.readings || [];
+      const firstEmpty = tbody.querySelector('tr .empty');
+      if (firstEmpty) {
+        tbody.innerHTML = '';
+      }
+      readings.forEach((r) => {
+        const tr = document.createElement('tr');
+        const time = r.timestamp ? new Date(r.timestamp).toLocaleString() : '–';
+        tr.innerHTML = `<td>${escapeHtml(time)}</td><td>${escapeHtml(r.name)}</td><td>${escapeHtml(r.origin)}</td><td>${escapeHtml(r.destination)}</td>`;
+        tbody.appendChild(tr);
+      });
+    });
+
+    function escapeHtml(s) {
+      const div = document.createElement('div');
+      div.textContent = s;
+      return div.innerHTML;
+    }
+  </script>
+</body>
+</html>

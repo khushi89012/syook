@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  mongo:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  listener:
+    build:
+      context: .
+      dockerfile: Dockerfile.listener
+    ports:
+      - "3001:3001"
+      - "9000:9000"
+    environment:
+      MONGO_URI: mongodb://mongo:27017
+      LISTENER_TCP_PORT: 9000
+      LISTENER_HTTP_PORT: 3001
+      ENCRYPTION_PASSPHRASE: encrypted-timeseries-secret-key
+    depends_on:
+      - mongo
+
+  emitter:
+    build:
+      context: .
+      dockerfile: Dockerfile.emitter
+    environment:
+      LISTENER_HOST: listener
+      LISTENER_PORT: 9000
+      ENCRYPTION_PASSPHRASE: encrypted-timeseries-secret-key
+    depends_on:
+      - listener
+
+volumes:
+  mongo_data:
