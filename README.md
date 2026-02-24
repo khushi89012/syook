@@ -68,6 +68,3 @@ cd listener && node --test test/
 3. Valid messages get a `timestamp`, are bucketed by minute, and stored in MongoDB. Each document keyed by minute contains an array of `readings` with `name`, `origin`, `destination`, `timestamp`.
 4. Listener pushes new readings and aggregate stats (total received, total valid, success rate) to the frontend via Socket.IO.
 
-## Git
-
-Use frequent, small commits (e.g. one per feature or fix) and clear messages.
